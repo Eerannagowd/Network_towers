@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <math.h>
+
+typedef struct {
+    int x;
+    int y;
+    int quality;
+} Tower;
+
+double calculateDistance(int x1, int y1, int x2, int y2) {
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+int getNetworkQuality(Tower towers[], int numTowers, int radius, int *cx, int *cy) {
+    int maxQuality = 0;
+    *cx = 0;
+    *cy = 0;
+
+    for (int x = 0; x <= radius; x++) {
+        for (int y = 0; y <= radius; y++) {
+            int networkQuality = 0;
+
+            for (int i = 0; i < numTowers; i++) {
+                Tower tower = towers[i];
+                double distance = calculateDistance(x, y, tower.x, tower.y);
+
+                if (distance <= radius) {
+                    int signalQuality = tower.quality / (1 + (int)distance);
+                    networkQuality += signalQuality;
+                }
+            }
+
+            if (networkQuality > maxQuality) {
+                maxQuality = networkQuality;
+                *cx = x;
+                *cy = y;
+            }
+        }
+    }
+
+    return maxQuality;
+}
+
+int main() {
+    Tower towers[] = {{1, 2, 5}, {2, 1, 7}, {3, 1, 9}};
+    int numTowers = sizeof(towers) / sizeof(towers[0]);
+    int radius = 2;
+    int cx, cy;
+
+    int maxQuality = getNetworkQuality(towers, numTowers, radius, &cx, &cy);
+
+    printf("Maximum Network Quality: %d\n", maxQuality);
+    printf("Coordinates: [%d, %d]\n", cx, cy);
+
+    return 0;
+}
